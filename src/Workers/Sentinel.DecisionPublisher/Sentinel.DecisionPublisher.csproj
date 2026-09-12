@@ -1,0 +1,6 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+  <ItemGroup>
+    <ProjectReference Include="..\..\RiskEngine\Sentinel.RiskEngine.Infrastructure\Sentinel.RiskEngine.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Sentinel.ServiceDefaults\Sentinel.ServiceDefaults.csproj" />
+  </ItemGroup>
+</Project>

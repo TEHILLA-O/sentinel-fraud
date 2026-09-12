@@ -1,0 +1,34 @@
+@page "/analytics"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Contracts
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+
+<h1 class="page-title">Analytics</h1>
+<div class="cards">
+    <div class="card"><div class="label">Processed</div><div class="value">@total</div></div>
+    <div class="card"><div class="label">Approval rate</div><div class="value">@Rate(approved)</div></div>
+    <div class="card"><div class="label">Review rate</div><div class="value">@Rate(review)</div></div>
+    <div class="card"><div class="label">Block rate</div><div class="value">@Rate(blocked)</div></div>
+    <div class="card"><div class="label">Avg score</div><div class="value">@avg.ToString("N1")</div></div>
+    <div class="card"><div class="label">Cases</div><div class="value">@cases</div></div>
+</div>
+<p class="muted">Figures are computed from persisted demo/generated traffic, not fabricated production KPIs.</p>
+
+@code {
+    private int total, approved, review, blocked, cases;
+    private double avg;
+
+    protected override async Task OnInitializedAsync()
+    {
+        total = await Db.RiskDecisions.CountAsync();
+        approved = await Db.RiskDecisions.CountAsync(d => d.Decision == RiskDecision.Approve);
+        review = await Db.RiskDecisions.CountAsync(d => d.Decision == RiskDecision.Review);
+        blocked = await Db.RiskDecisions.CountAsync(d => d.Decision == RiskDecision.Block);
+        avg = total == 0 ? 0 : await Db.RiskDecisions.AverageAsync(d => (double)d.RiskScore);
+        cases = await Db.Cases.CountAsync();
+    }
+
+    private string Rate(int count) => total == 0 ? "0%" : $"{(100d * count / total):N1}%";
+}

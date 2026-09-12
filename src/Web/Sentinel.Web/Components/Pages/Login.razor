@@ -1,0 +1,60 @@
+@page "/login"
+@layout Layout.MainLayout
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Authentication.Cookies
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+@inject NavigationManager Nav
+
+<div class="panel login">
+    <h1>Sign in to Sentinel</h1>
+    <p class="muted">Use a seeded local account. Password for every role is <code>Sentinel!23</code>.</p>
+    <EditForm Model="model" OnValidSubmit="SignInAsync" FormName="login">
+        <div class="stack">
+            <label>Email<input @bind="model.Email" /></label>
+            <label>Password<input type="password" @bind="model.Password" /></label>
+            <button type="submit">Continue</button>
+            @if (!string.IsNullOrWhiteSpace(error))
+            {
+                <p class="muted">@error</p>
+            }
+        </div>
+    </EditForm>
+    <p class="muted">analyst@sentinel.local · senior@sentinel.local · risk@sentinel.local · admin@sentinel.local · auditor@sentinel.local</p>
+</div>
+
+@code {
+    [SupplyParameterFromForm] private LoginModel model { get; set; } = new() { Email = "analyst@sentinel.local", Password = "Sentinel!23" };
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+    private string? error;
+
+    private async Task SignInAsync()
+    {
+        var user = await Db.Users.FirstOrDefaultAsync(u => u.Email == model.Email && u.Active);
+        if (user is null || !BCrypt.Net.BCrypt.Verify(model.Password, user.PasswordHash) || HttpContext is null)
+        {
+            error = "Invalid credentials.";
+            return;
+        }
+
+        var claims = new List<Claim>
+        {
+            new(ClaimTypes.Name, user.DisplayName),
+            new(ClaimTypes.Email, user.Email),
+            new(ClaimTypes.Role, user.Role)
+        };
+        await HttpContext.SignInAsync(
+            CookieAuthenticationDefaults.AuthenticationScheme,
+            new ClaimsPrincipal(new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme)));
+        Nav.NavigateTo("/", true);
+    }
+
+    private sealed class LoginModel
+    {
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+    }
+}

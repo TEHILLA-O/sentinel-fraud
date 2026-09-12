@@ -1,0 +1,43 @@
+@page "/profiles/{AccountId}"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+
+@if (profile is null)
+{
+    <p>Profile not found.</p>
+}
+else
+{
+    <h1 class="page-title">Customer @profile.CustomerId</h1>
+    <div class="cards">
+        <div class="card"><div class="label">Home</div><div class="value">@profile.HomeCountry</div></div>
+        <div class="card"><div class="label">Average</div><div class="value">@profile.AverageTransactionAmount.ToString("N2")</div></div>
+        <div class="card"><div class="label">Median</div><div class="value">@profile.MedianTransactionAmount.ToString("N2")</div></div>
+        <div class="card"><div class="label">Lifetime tx</div><div class="value">@profile.LifetimeTransactionCount</div></div>
+    </div>
+    <div class="panel">
+        <p>Account opened @profile.AccountOpenedAt.UtcDateTime.ToString("d") · daily spend @profile.AverageDailySpend.ToString("N2")</p>
+        <h3>Known devices</h3>
+        @foreach (var device in devices)
+        {
+            <div class="rule"><span>@device.DeviceId</span><span>@(device.Trusted ? "trusted" : "untrusted") · @device.TransactionCount tx</span></div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public string AccountId { get; set; } = "";
+    private CustomerProfileRecord? profile;
+    private List<KnownDeviceRecord> devices = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        profile = await Db.CustomerProfiles.AsNoTracking().FirstOrDefaultAsync(p => p.AccountId == AccountId);
+        if (profile is not null)
+        {
+            devices = await Db.KnownDevices.AsNoTracking().Where(d => d.CustomerId == profile.CustomerId).ToListAsync();
+        }
+    }
+}

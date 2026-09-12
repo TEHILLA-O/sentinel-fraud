@@ -1,0 +1,88 @@
+:root {
+  --bg: #071018;
+  --panel: #0e1a24;
+  --panel-2: #132433;
+  --line: #1f3547;
+  --text: #d7e6f2;
+  --muted: #87a0b5;
+  --accent: #3ee0c1;
+  --warn: #f4c15d;
+  --danger: #ff6b7a;
+  --ok: #5ad67a;
+  font-family: "Segoe UI", "IBM Plex Sans", sans-serif;
+}
+
+html, body {
+  margin: 0;
+  background: radial-gradient(circle at top, #102433 0%, var(--bg) 45%);
+  color: var(--text);
+  min-height: 100vh;
+}
+
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.shell { display: grid; grid-template-columns: 240px 1fr; min-height: 100vh; }
+.nav {
+  background: #08141d;
+  border-right: 1px solid var(--line);
+  padding: 24px 18px;
+}
+.brand { font-size: 1.15rem; letter-spacing: 0.16em; font-weight: 700; color: var(--accent); }
+.brand small { display: block; color: var(--muted); letter-spacing: 0.08em; font-size: 0.7rem; margin-top: 4px; }
+.nav a {
+  display: block;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: var(--text);
+  margin-top: 6px;
+}
+.nav a.active, .nav a:hover { background: var(--panel-2); text-decoration: none; }
+.main { padding: 28px; }
+.page-title { margin: 0 0 18px; font-size: 1.6rem; }
+.cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 12px; margin-bottom: 18px; }
+.card, .panel {
+  background: color-mix(in srgb, var(--panel) 92%, black);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 16px;
+}
+.card .label { color: var(--muted); font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.08em; }
+.card .value { font-size: 1.6rem; margin-top: 8px; font-variant-numeric: tabular-nums; }
+table { width: 100%; border-collapse: collapse; }
+th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid var(--line); font-size: 0.92rem; }
+th { color: var(--muted); font-weight: 600; }
+.badge { padding: 3px 8px; border-radius: 999px; font-size: 0.75rem; font-weight: 700; }
+.badge.approve { background: #16351f; color: var(--ok); }
+.badge.review { background: #3a2d10; color: var(--warn); }
+.badge.block { background: #3a1218; color: var(--danger); }
+.login {
+  max-width: 420px;
+  margin: 12vh auto;
+}
+input, select, textarea, button {
+  font: inherit;
+}
+input, select, textarea {
+  width: 100%;
+  box-sizing: border-box;
+  background: #0b1822;
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+button, .btn {
+  background: var(--accent);
+  color: #04221c;
+  border: 0;
+  border-radius: 8px;
+  padding: 10px 14px;
+  font-weight: 700;
+  cursor: pointer;
+}
+button.secondary { background: transparent; color: var(--text); border: 1px solid var(--line); }
+.muted { color: var(--muted); }
+.stack { display: grid; gap: 10px; }
+.row { display: flex; gap: 10px; flex-wrap: wrap; }
+.rule { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); }

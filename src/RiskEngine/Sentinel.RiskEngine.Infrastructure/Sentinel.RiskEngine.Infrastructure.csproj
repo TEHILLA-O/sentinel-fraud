@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Microsoft.ML" />
+    <PackageReference Include="StackExchange.Redis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\Sentinel.Eventing\Sentinel.Eventing.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\Sentinel.Persistence\Sentinel.Persistence.csproj" />
+    <ProjectReference Include="..\Sentinel.RiskEngine.Application\Sentinel.RiskEngine.Application.csproj" />
+  </ItemGroup>
+</Project>

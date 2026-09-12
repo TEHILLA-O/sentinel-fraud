@@ -1,0 +1,37 @@
+@page "/alerts"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Contracts
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+
+<h1 class="page-title">Alerts</h1>
+<div class="panel">
+    <table>
+        <thead><tr><th>When</th><th>Transaction</th><th>Score</th><th>Decision</th></tr></thead>
+        <tbody>
+        @foreach (var alert in alerts)
+        {
+            <tr>
+                <td>@alert.CreatedAt.UtcDateTime.ToString("u")</td>
+                <td><a href="/transactions/@alert.TransactionId">@alert.TransactionId</a></td>
+                <td>@alert.RiskScore</td>
+                <td><span class="badge @alert.Decision.ToString().ToLowerInvariant()">@alert.Decision</span></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<RiskDecisionRecord> alerts = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        alerts = await Db.RiskDecisions.AsNoTracking()
+            .Where(d => d.Decision == RiskDecision.Review || d.Decision == RiskDecision.Block)
+            .OrderByDescending(d => d.CreatedAt)
+            .Take(100)
+            .ToListAsync();
+    }
+}

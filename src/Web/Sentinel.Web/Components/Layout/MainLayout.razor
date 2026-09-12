@@ -1,0 +1,29 @@
+﻿@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Components.Authorization
+
+<div class="shell">
+    <aside class="nav">
+        <div class="brand">SENTINEL<small>Fraud operations</small></div>
+        <AuthorizeView>
+            <Authorized>
+                <NavLink href="/" Match="NavLinkMatch.All">Live transactions</NavLink>
+                <NavLink href="/alerts">Alerts</NavLink>
+                <NavLink href="/cases">Fraud cases</NavLink>
+                <NavLink href="/analytics">Analytics</NavLink>
+                <NavLink href="/rules">Rule configuration</NavLink>
+                <NavLink href="/audit">Audit log</NavLink>
+                <NavLink href="/health">System health</NavLink>
+                <form action="/logout" method="post" style="margin-top:24px">
+                    <AntiforgeryToken />
+                    <button class="secondary" type="submit">Sign out @context.User.Identity?.Name</button>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <NavLink href="/login">Sign in</NavLink>
+            </NotAuthorized>
+        </AuthorizeView>
+    </aside>
+    <main class="main">
+        @Body
+    </main>
+</div>

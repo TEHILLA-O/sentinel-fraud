@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="Testcontainers" />
+    <PackageReference Include="Testcontainers.Kafka" />
+    <PackageReference Include="Testcontainers.PostgreSql" />
+    <PackageReference Include="Testcontainers.Redis" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Administration\Sentinel.Admin.Api\Sentinel.Admin.Api.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\Sentinel.Eventing\Sentinel.Eventing.csproj" />
+    <ProjectReference Include="..\..\src\BuildingBlocks\Sentinel.Persistence\Sentinel.Persistence.csproj" />
+    <ProjectReference Include="..\..\src\RiskEngine\Sentinel.RiskEngine.Infrastructure\Sentinel.RiskEngine.Infrastructure.csproj" />
+    <ProjectReference Include="..\Sentinel.Domain.Tests\Sentinel.Domain.Tests.csproj" />
+  </ItemGroup>
+</Project>

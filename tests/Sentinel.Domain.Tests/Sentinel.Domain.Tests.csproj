@@ -1,0 +1,17 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\RiskEngine\Sentinel.RiskEngine.Application\Sentinel.RiskEngine.Application.csproj" />
+    <ProjectReference Include="..\..\src\RiskEngine\Sentinel.RiskEngine.Domain\Sentinel.RiskEngine.Domain.csproj" />
+    <ProjectReference Include="..\..\src\RiskEngine\Sentinel.RiskEngine.Infrastructure\Sentinel.RiskEngine.Infrastructure.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,32 @@
+@page "/rules"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+
+<h1 class="page-title">Rule configuration</h1>
+<p class="muted">Active ruleset @version. Historical decisions keep the version they were scored with.</p>
+<div class="panel">
+    @foreach (var rule in rules)
+    {
+        <div class="rule">
+            <span>@rule.RuleCode</span>
+            <span>@(rule.Enabled ? "enabled" : "disabled") · score @rule.Score · @rule.ParametersJson</span>
+        </div>
+    }
+</div>
+
+@code {
+    private string version = "";
+    private List<RiskRuleConfigurationRecord> rules = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var active = await Db.RulesetVersions.AsNoTracking().FirstAsync(v => v.IsActive);
+        version = active.Version;
+        rules = await Db.RiskRuleConfigurations.AsNoTracking()
+            .Where(r => r.RulesetVersion == version)
+            .OrderBy(r => r.RuleCode)
+            .ToListAsync();
+    }
+}

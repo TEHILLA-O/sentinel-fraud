@@ -1,0 +1,101 @@
+@page "/cases/{CaseId:guid}"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@rendermode InteractiveServer
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Contracts
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+
+@if (fraudCase is null)
+{
+    <p>Case not found.</p>
+}
+else
+{
+    <h1 class="page-title">Case @fraudCase.CaseId</h1>
+    <div class="cards">
+        <div class="card"><div class="label">Status</div><div class="value">@fraudCase.Status</div></div>
+        <div class="card"><div class="label">Score</div><div class="value">@fraudCase.RiskScore</div></div>
+        <div class="card"><div class="label">Analyst</div><div class="value">@(fraudCase.AssignedAnalyst ?? "-")</div></div>
+    </div>
+    <div class="panel">
+        <p><a href="/transactions/@fraudCase.TransactionId">Open transaction @fraudCase.TransactionId</a></p>
+        <div class="row">
+            <button @onclick="() => Move(CaseStatus.Assigned)">Assign me</button>
+            <button class="secondary" @onclick="() => Move(CaseStatus.Investigating)">Investigate</button>
+            <button class="secondary" @onclick="() => Move(CaseStatus.Escalated)">Escalate</button>
+            <button class="secondary" @onclick="() => Move(CaseStatus.ConfirmedFraud)">Mark fraud</button>
+            <button class="secondary" @onclick="() => Move(CaseStatus.FalsePositive)">False positive</button>
+            <button class="secondary" @onclick="() => Move(CaseStatus.Closed)">Close</button>
+        </div>
+        <h3>Notes</h3>
+        <textarea @bind="note"></textarea>
+        <button @onclick="AddNote">Add note</button>
+        @foreach (var item in notes)
+        {
+            <p><strong>@item.Author</strong> @item.CreatedAt.UtcDateTime.ToString("u")<br />@item.Body</p>
+        }
+        <h3>History</h3>
+        @foreach (var item in history)
+        {
+            <div class="rule"><span>@item.FromStatus → @item.ToStatus</span><span class="muted">@item.Actor</span></div>
+        }
+    </div>
+}
+
+@code {
+    [Parameter] public Guid CaseId { get; set; }
+    private FraudCaseRecord? fraudCase;
+    private List<AnalystNoteRecord> notes = [];
+    private List<CaseHistoryRecord> history = [];
+    private string note = "";
+
+    protected override Task OnParametersSetAsync() => LoadAsync();
+
+    private async Task LoadAsync()
+    {
+        fraudCase = await Db.Cases.FirstOrDefaultAsync(c => c.CaseId == CaseId);
+        notes = await Db.AnalystNotes.Where(n => n.CaseId == CaseId).OrderBy(n => n.CreatedAt).ToListAsync();
+        history = await Db.CaseHistory.Where(h => h.CaseId == CaseId).OrderBy(h => h.ChangedAt).ToListAsync();
+    }
+
+    private async Task AddNote()
+    {
+        if (string.IsNullOrWhiteSpace(note)) return;
+        Db.AnalystNotes.Add(new AnalystNoteRecord
+        {
+            Id = Guid.CreateVersion7(),
+            CaseId = CaseId,
+            Author = "analyst",
+            Body = note,
+            CreatedAt = DateTimeOffset.UtcNow
+        });
+        await Db.SaveChangesAsync();
+        note = "";
+        await LoadAsync();
+    }
+
+    private async Task Move(CaseStatus status)
+    {
+        if (fraudCase is null) return;
+        var from = fraudCase.Status;
+        fraudCase.Status = status;
+        fraudCase.UpdatedAt = DateTimeOffset.UtcNow;
+        if (status == CaseStatus.Assigned)
+        {
+            fraudCase.AssignedAnalyst = "analyst";
+        }
+        Db.CaseHistory.Add(new CaseHistoryRecord
+        {
+            Id = Guid.CreateVersion7(),
+            CaseId = CaseId,
+            FromStatus = from,
+            ToStatus = status,
+            Actor = "analyst",
+            Notes = note,
+            ChangedAt = DateTimeOffset.UtcNow
+        });
+        await Db.SaveChangesAsync();
+        await LoadAsync();
+    }
+}

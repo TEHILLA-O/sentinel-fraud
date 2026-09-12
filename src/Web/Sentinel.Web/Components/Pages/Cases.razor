@@ -1,0 +1,31 @@
+@page "/cases"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+
+<h1 class="page-title">Fraud cases</h1>
+<div class="panel">
+    <table>
+        <thead><tr><th>Case</th><th>Transaction</th><th>Score</th><th>Status</th><th>Analyst</th></tr></thead>
+        <tbody>
+        @foreach (var item in cases)
+        {
+            <tr>
+                <td><a href="/cases/@item.CaseId">@item.CaseId.ToString()[..8]</a></td>
+                <td>@item.TransactionId</td>
+                <td>@item.RiskScore</td>
+                <td>@item.Status</td>
+                <td>@(item.AssignedAnalyst ?? "unassigned")</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<FraudCaseRecord> cases = [];
+
+    protected override async Task OnInitializedAsync() =>
+        cases = await Db.Cases.AsNoTracking().OrderByDescending(c => c.CreatedAt).Take(100).ToListAsync();
+}

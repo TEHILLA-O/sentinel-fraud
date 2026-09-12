@@ -1,0 +1,11 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="Confluent.Kafka" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" />
+    <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Sentinel.Contracts\Sentinel.Contracts.csproj" />
+    <ProjectReference Include="..\Sentinel.SharedKernel\Sentinel.SharedKernel.csproj" />
+  </ItemGroup>
+</Project>

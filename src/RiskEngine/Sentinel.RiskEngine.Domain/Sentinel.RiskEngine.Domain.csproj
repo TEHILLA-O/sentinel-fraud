@@ -1,0 +1,6 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\..\BuildingBlocks\Sentinel.Contracts\Sentinel.Contracts.csproj" />
+    <ProjectReference Include="..\..\BuildingBlocks\Sentinel.SharedKernel\Sentinel.SharedKernel.csproj" />
+  </ItemGroup>
+</Project>

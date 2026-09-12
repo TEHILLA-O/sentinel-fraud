@@ -1,0 +1,30 @@
+@page "/audit"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+
+<h1 class="page-title">Audit log</h1>
+<div class="panel">
+    <table>
+        <thead><tr><th>When</th><th>Actor</th><th>Action</th><th>Entity</th></tr></thead>
+        <tbody>
+        @foreach (var item in events)
+        {
+            <tr>
+                <td>@item.OccurredAt.UtcDateTime.ToString("u")</td>
+                <td>@item.Actor</td>
+                <td>@item.Action</td>
+                <td>@item.EntityType @item.EntityId</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private List<AuditEventRecord> events = [];
+
+    protected override async Task OnInitializedAsync() =>
+        events = await Db.AuditEvents.AsNoTracking().OrderByDescending(a => a.OccurredAt).Take(100).ToListAsync();
+}

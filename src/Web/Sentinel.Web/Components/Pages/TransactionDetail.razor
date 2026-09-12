@@ -1,0 +1,48 @@
+@page "/transactions/{TransactionId}"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using System.Text.Json
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Persistence
+@using Sentinel.RiskEngine.Domain.Rules
+@inject SentinelDbContext Db
+
+@if (transaction is null || decision is null)
+{
+    <p>Transaction not found or still processing.</p>
+}
+else
+{
+    <h1 class="page-title">@transaction.TransactionId</h1>
+    <div class="cards">
+        <div class="card"><div class="label">Amount</div><div class="value">@transaction.Amount.ToString("N2") @transaction.Currency</div></div>
+        <div class="card"><div class="label">Score</div><div class="value">@decision.RiskScore</div></div>
+        <div class="card"><div class="label">Decision</div><div class="value">@decision.Decision</div></div>
+        <div class="card"><div class="label">Ruleset</div><div class="value">@decision.RulesetVersion</div></div>
+    </div>
+    <div class="panel">
+        <p>Customer <a href="/profiles/@transaction.AccountId">@transaction.CustomerId</a> · @transaction.Country @transaction.City · @transaction.Channel · device @(transaction.DeviceId ?? "unknown")</p>
+        <p class="muted">Correlation @decision.CorrelationId · processed in @decision.ProcessingTimeMs ms · model @decision.ModelVersion</p>
+        <h3>Triggered rules</h3>
+        @foreach (var rule in rules)
+        {
+            <div class="rule"><span>@rule.RuleCode</span><span>+@rule.Score · @rule.Reason</span></div>
+        }
+        <p>Final score: <strong>@decision.RiskScore</strong> (raw @decision.RawScore)</p>
+    </div>
+}
+
+@code {
+    [Parameter] public string TransactionId { get; set; } = "";
+    private TransactionRecord? transaction;
+    private RiskDecisionRecord? decision;
+    private List<RiskRuleResult> rules = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        transaction = await Db.Transactions.AsNoTracking().FirstOrDefaultAsync(t => t.TransactionId == TransactionId);
+        decision = await Db.RiskDecisions.AsNoTracking().FirstOrDefaultAsync(d => d.TransactionId == TransactionId);
+        rules = decision is null
+            ? []
+            : JsonSerializer.Deserialize<List<RiskRuleResult>>(decision.TriggeredRulesJson) ?? [];
+    }
+}

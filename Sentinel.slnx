@@ -1,0 +1,44 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Sentinel.AppHost/Sentinel.AppHost.csproj" />
+    <Project Path="src/Sentinel.ServiceDefaults/Sentinel.ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/src/Administration/">
+    <Project Path="src/Administration/Sentinel.Admin.Api/Sentinel.Admin.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/BuildingBlocks/">
+    <Project Path="src/BuildingBlocks/Sentinel.Contracts/Sentinel.Contracts.csproj" />
+    <Project Path="src/BuildingBlocks/Sentinel.Eventing/Sentinel.Eventing.csproj" />
+    <Project Path="src/BuildingBlocks/Sentinel.Persistence/Sentinel.Persistence.csproj" />
+    <Project Path="src/BuildingBlocks/Sentinel.SharedKernel/Sentinel.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/CaseManagement/">
+    <Project Path="src/CaseManagement/Sentinel.Cases.Api/Sentinel.Cases.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/Ingestion/">
+    <Project Path="src/Ingestion/Sentinel.Ingestion.Api/Sentinel.Ingestion.Api.csproj" />
+  </Folder>
+  <Folder Name="/src/RiskEngine/">
+    <Project Path="src/RiskEngine/Sentinel.RiskEngine.Application/Sentinel.RiskEngine.Application.csproj" />
+    <Project Path="src/RiskEngine/Sentinel.RiskEngine.Domain/Sentinel.RiskEngine.Domain.csproj" />
+    <Project Path="src/RiskEngine/Sentinel.RiskEngine.Infrastructure/Sentinel.RiskEngine.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Web/">
+    <Project Path="src/Web/Sentinel.Web/Sentinel.Web.csproj" />
+  </Folder>
+  <Folder Name="/src/Workers/">
+    <Project Path="src/Workers/Sentinel.DecisionPublisher/Sentinel.DecisionPublisher.csproj" />
+    <Project Path="src/Workers/Sentinel.ProfileProcessor/Sentinel.ProfileProcessor.csproj" />
+    <Project Path="src/Workers/Sentinel.TransactionProcessor/Sentinel.TransactionProcessor.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Sentinel.ArchitectureTests/Sentinel.ArchitectureTests.csproj" />
+    <Project Path="tests/Sentinel.Domain.Tests/Sentinel.Domain.Tests.csproj" />
+    <Project Path="tests/Sentinel.IntegrationTests/Sentinel.IntegrationTests.csproj" />
+    <Project Path="tests/Sentinel.PerformanceTests/Sentinel.PerformanceTests.csproj" />
+    <Project Path="tests/Sentinel.RuleTests/Sentinel.RuleTests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/Sentinel.TransactionGenerator/Sentinel.TransactionGenerator.csproj" />
+  </Folder>
+</Solution>

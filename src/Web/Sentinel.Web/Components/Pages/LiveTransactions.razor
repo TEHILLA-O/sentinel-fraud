@@ -1,0 +1,97 @@
+@page "/"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.SignalR.Client
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Contracts
+@using Sentinel.Contracts.Events
+@using Sentinel.Contracts.Json
+@using Sentinel.Persistence
+@inject SentinelDbContext Db
+@inject NavigationManager Nav
+@implements IAsyncDisposable
+
+<h1 class="page-title">Live transactions</h1>
+<div class="cards">
+    <div class="card"><div class="label">Visible</div><div class="value">@rows.Count</div></div>
+    <div class="card"><div class="label">Blocked</div><div class="value">@rows.Count(r => r.Decision == RiskDecision.Block)</div></div>
+    <div class="card"><div class="label">Review</div><div class="value">@rows.Count(r => r.Decision == RiskDecision.Review)</div></div>
+</div>
+<div class="panel">
+    <table>
+        <thead>
+            <tr><th>TX ID</th><th>Amount</th><th>Country</th><th>Risk</th><th>Decision</th></tr>
+        </thead>
+        <tbody>
+        @foreach (var row in rows.Take(50))
+        {
+            <tr>
+                <td><a href="/transactions/@row.TransactionId">@row.TransactionId</a></td>
+                <td>@row.Amount.ToString("N2") @row.Currency</td>
+                <td>@row.Country</td>
+                <td>@row.RiskScore.ToString("00")</td>
+                <td><span class="badge @row.Decision.ToString().ToLowerInvariant()">@row.Decision.ToString().ToUpperInvariant()</span></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+</div>
+
+@code {
+    private readonly List<LiveRow> rows = [];
+    private HubConnection? hub;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var existing = await Db.RiskDecisions.AsNoTracking()
+            .OrderByDescending(d => d.CreatedAt)
+            .Take(40)
+            .Join(Db.Transactions.AsNoTracking(), d => d.TransactionId, t => t.TransactionId, (d, t) => new LiveRow
+            {
+                TransactionId = t.TransactionId,
+                Amount = t.Amount,
+                Currency = t.Currency,
+                Country = t.Country,
+                RiskScore = d.RiskScore,
+                Decision = d.Decision
+            })
+            .ToListAsync();
+        rows.AddRange(existing);
+
+        hub = new HubConnectionBuilder().WithUrl(Nav.ToAbsoluteUri("/hubs/live")).WithAutomaticReconnect().Build();
+        hub.On<string>(Realtime.LiveDecisionHub.Decisions, payload =>
+        {
+            var decision = SentinelJson.Deserialize<RiskDecisionV1>(payload);
+            if (decision is null) return;
+            rows.Insert(0, new LiveRow
+            {
+                TransactionId = decision.TransactionId,
+                Amount = decision.Transaction.Amount,
+                Currency = decision.Transaction.Currency,
+                Country = decision.Transaction.Country,
+                RiskScore = decision.RiskScore,
+                Decision = decision.Decision
+            });
+            _ = InvokeAsync(StateHasChanged);
+        });
+        await hub.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hub is not null)
+        {
+            await hub.DisposeAsync();
+        }
+    }
+
+    private sealed class LiveRow
+    {
+        public string TransactionId { get; set; } = "";
+        public decimal Amount { get; set; }
+        public string Currency { get; set; } = "GBP";
+        public string Country { get; set; } = "";
+        public int RiskScore { get; set; }
+        public RiskDecision Decision { get; set; }
+    }
+}

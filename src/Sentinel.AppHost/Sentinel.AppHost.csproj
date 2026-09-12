@@ -1,0 +1,22 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.5.3">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <UserSecretsId>30264662-e1ab-4765-a274-be1665f5e861</UserSecretsId>
+    <AspireUseCliBundle>true</AspireUseCliBundle>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.AppHost" />
+    <PackageReference Include="Aspire.Hosting.Kafka" />
+    <PackageReference Include="Aspire.Hosting.PostgreSQL" />
+    <PackageReference Include="Aspire.Hosting.Redis" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Administration\Sentinel.Admin.Api\Sentinel.Admin.Api.csproj" />
+    <ProjectReference Include="..\CaseManagement\Sentinel.Cases.Api\Sentinel.Cases.Api.csproj" />
+    <ProjectReference Include="..\Ingestion\Sentinel.Ingestion.Api\Sentinel.Ingestion.Api.csproj" />
+    <ProjectReference Include="..\Web\Sentinel.Web\Sentinel.Web.csproj" />
+    <ProjectReference Include="..\Workers\Sentinel.DecisionPublisher\Sentinel.DecisionPublisher.csproj" />
+    <ProjectReference Include="..\Workers\Sentinel.ProfileProcessor\Sentinel.ProfileProcessor.csproj" />
+    <ProjectReference Include="..\Workers\Sentinel.TransactionProcessor\Sentinel.TransactionProcessor.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,25 @@
+@page "/health"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@using Microsoft.EntityFrameworkCore
+@using Sentinel.Persistence
+@using Sentinel.SharedKernel
+@inject SentinelDbContext Db
+
+<h1 class="page-title">System health</h1>
+<div class="cards">
+    <div class="card"><div class="label">Decisions</div><div class="value">@decisions</div></div>
+    <div class="card"><div class="label">Open cases</div><div class="value">@open</div></div>
+    <div class="card"><div class="label">Outbox pending</div><div class="value">@outbox</div></div>
+</div>
+<p class="muted">Probe endpoints: <code>/health</code> and <code>/alive</code>. OpenTelemetry meter @SentinelTelemetry.MeterName is exported when OTLP is configured.</p>
+
+@code {
+    private int decisions, open, outbox;
+
+    protected override async Task OnInitializedAsync()
+    {
+        decisions = await Db.RiskDecisions.CountAsync();
+        open = await Db.Cases.CountAsync(c => c.Status == Sentinel.Contracts.CaseStatus.Open || c.Status == Sentinel.Contracts.CaseStatus.Assigned);
+        outbox = await Db.OutboxMessages.CountAsync(o => o.PublishedAt == null);
+    }
+}
