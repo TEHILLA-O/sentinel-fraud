@@ -2,6 +2,8 @@
 
 Real-time transaction monitoring, fraud detection and risk decision platform.
 
+See [FAILURES.md](./FAILURES.md) for what can go wrong, what broke, how it was fixed, and results.
+
 Sentinel is a C# / .NET 10 event-driven system. It ingests card and payment events, scores them with an explainable rules engine, and lets fraud analysts work cases from a Blazor console.
 
 It exists to demonstrate production-shaped distributed systems work: Kafka, Redis velocity, PostgreSQL auditability, idempotent consumers, and a deterministic risk model that a reviewer can step through.
